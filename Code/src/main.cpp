@@ -105,17 +105,21 @@ void loop() {
   int w;
   int h;
   if(huskylens.requestBlocksLearned()){
+    Serial.println("seen once");
     result = huskylens.getBlockLearned(1);
     x = result.xCenter;
     w = result.width;
     h = result.height;
     delay(500);
     if(huskylens.requestBlocksLearned()){
+      Serial.println("seen twice");
       if(w > 160, h > 100){
         if(x < 160){
+          Serial.println("right");
           right();
         }
         else if(x > 160){
+          Serial.println("left");
           left();
         }
       }
