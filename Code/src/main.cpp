@@ -113,7 +113,7 @@ void loop() {
     delay(500);
     if(huskylens.requestBlocksLearned()){
       Serial.println("seen twice");
-      if(w > 160, h > 100){
+      if(w > 160 && h > 100){
         if(x < 160){
           Serial.println("right");
           right();
