@@ -20,41 +20,41 @@ HUSKYLENSResult result;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 #define LOGO_HEIGHT   16
-#define LOGO_WIDTH    16
+#define LOGO_WIDTH    32
 static const unsigned char PROGMEM bmp_right[] =
-{ 0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b11000000,
-  0b00000000, 0b11110000,
-  0b11111111, 0b11111100,
-  0b11111111, 0b11111111,
-  0b11111111, 0b11111111,
-  0b11111111, 0b11111100,
-  0b00000000, 0b11110000,
-  0b00000000, 0b11000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000 };
+{ 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+  0b00000000, 0b00000000, 0b11110000, 0b00000000,
+  0b00000000, 0b00000000, 0b11111100, 0b00000000,
+  0b00000000, 0b00000000, 0b11111111, 0b00000000,
+  0b00000000, 0b00000000, 0b11111111, 0b11000000,
+  0b00000000, 0b00000000, 0b11111111, 0b11110000,
+  0b11111111, 0b11111111, 0b11111111, 0b11111100,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111100,
+  0b00000000, 0b00000000, 0b11111111, 0b11110000,
+  0b00000000, 0b00000000, 0b11111111, 0b11000000,
+  0b00000000, 0b00000000, 0b11111111, 0b00000000,
+  0b00000000, 0b00000000, 0b11111100, 0b00000000,
+  0b00000000, 0b00000000, 0b11110000, 0b00000000 };
 static const unsigned char PROGMEM bmp_left[] =
-{ 0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000011, 0b00000000,
-  0b00001111, 0b00000000,
-  0b00111111, 0b11111111,
-  0b11111111, 0b11111111,
-  0b11111111, 0b11111111,
-  0b00111111, 0b11111111,
-  0b00001111, 0b00000000,
-  0b00000011, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000,
-  0b00000000, 0b00000000 };
+{ 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+  0b00000000, 0b00001111, 0b00000000, 0b00000000,
+  0b00000000, 0b00111111, 0b00000000, 0b00000000,
+  0b00000000, 0b11111111, 0b00000000, 0b00000000,
+  0b00000011, 0b11111111, 0b00000000, 0b00000000,
+  0b00001111, 0b11111111, 0b00000000, 0b00000000,
+  0b00111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b11111111, 0b11111111, 0b11111111, 0b11111111,
+  0b00111111, 0b11111111, 0b11111111, 0b11111111,
+  0b00001111, 0b11111111, 0b00000000, 0b00000000,
+  0b00000011, 0b11111111, 0b00000000, 0b00000000,
+  0b00000000, 0b11111111, 0b00000000, 0b00000000,
+  0b00000000, 0b00111111, 0b00000000, 0b00000000,
+  0b00000000, 0b00001111, 0b00000000, 0b00000000 };
 
 void left();
 void right();
@@ -105,26 +105,37 @@ void loop() {
   int x;
   int w;
   int h;
-  if(huskylens.requestBlocksLearned()){
-    Serial.println("seen once");
-    result = huskylens.getBlockLearned(1);
-    x = result.xCenter;
-    w = result.width;
-    h = result.height;
-    delay(500);
-    if(huskylens.requestBlocksLearned()){
-      Serial.println("seen twice");
-      if(w > 160 && h > 100){
-        if(x < 160){
-          Serial.println("right");
-          right();
-        }
-        else if(x > 160){
-          Serial.println("left");
-          left();
+  if (!huskylens.request()) Serial.println(F("Fail to request objects from HUSKYLENS!"));
+  else if(!huskylens.isLearned()) Serial.println(F("Object not learned!"));
+  else if(!huskylens.available()){
+    Serial.println(F("Object disappeared!"));
+    display.clearDisplay();
+    display.display();
+  }
+  else{
+    // if(huskylens.count() > 0){
+      Serial.println("seen once");
+      // result = huskylens.get(1);
+      result = huskylens.read();
+      x = result.xCenter;
+      w = result.width;
+      h = result.height;
+      delay(500);
+      if(huskylens.count() > 0){
+        Serial.println("seen twice");
+        if(w > 10 && h > 10){
+          Serial.println("big enough");
+          if(x < 160){
+            Serial.println("right");
+            right();
+          }
+          else if(x > 160){
+            Serial.println("left");
+            left();
+          }
         }
       }
-    }
+    // }
   }
 
 }
