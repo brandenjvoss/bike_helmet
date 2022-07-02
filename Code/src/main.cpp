@@ -3,7 +3,7 @@
 #include <Adafruit_SSD1306.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
+// #include <Adafruit_GFX.h>
 
 HUSKYLENS huskylens;
 //HUSKYLENS green line >> SDA; blue line >> SCL
@@ -11,7 +11,7 @@ HUSKYLENS huskylens;
 HUSKYLENSResult result;
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 // The pins for I2C are defined by the Wire-library. 
@@ -65,11 +65,12 @@ void setup() {
 
  //Serial.begin(115200);
  Serial.begin(9600);
+ Wire.begin();
  
-//-------------------------------------------------------------------------------------------------
-//DISPLAYS
+  //-------------------------------------------------------------------------------------------------
+  //DISPLAYS
 
-   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
@@ -82,11 +83,11 @@ void setup() {
 
   // Clear the buffer
   display.clearDisplay();
+  display.display();
 
   //-------------------------------------------------------------------------------------------------
   //HUSKYLENS
 
-  Wire.begin();
       while (!huskylens.begin(Wire))
       {
           Serial.println(F("Begin failed!"));
