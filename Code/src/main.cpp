@@ -119,47 +119,40 @@ void setup() {
 }
 
 void loop() {
-  delay(50);
+  delay(50); //delay for stability
   
   int x;
   int w;
   int h;
+  //check if Huskylens has seen something
   if (!huskylens.request()) Serial.println(F("Fail to request objects from HUSKYLENS!"));
   else if(!huskylens.isLearned()) Serial.println(F("Object not learned!"));
   else if(!huskylens.available()){
-    Serial.println(F("Object disappeared!"));
+    //Serial.println(F("Object disappeared!"));
     display.clearDisplay();
     display.display();
   }
-  else{
-    // if(huskylens.count() > 0){
-      Serial.println("seen once");
-      // result = huskylens.get(1);
-      result = huskylens.read();
+  else{  //if sees a car
+      result = huskylens.read();  //read object data from Huskylens
       x = result.xCenter;
       w = result.width;
       h = result.height;
       delay(500);
-      if(huskylens.count() > 0){
-        Serial.println("seen twice");
-        if(w > 10 && h > 10){
-          Serial.println("big enough");
-          if(x < 160){
-            Serial.println("right");
-            right();
+      if(huskylens.count() > 0){ //if it sees an object
+        if(w > 10 && h > 10){  //check object size to ensure no early indication
+          if(x < 160){  //check if on right side
+            right();  //signal right
           }
-          else if(x > 160){
-            Serial.println("left");
-            left();
+          else if(x > 160){  //check if on left side
+            left();  //signal left
           }
         }
       }
-    // }
   }
 
 }
 
-void right() {
+void right() {  //send right indicator to display
   display.clearDisplay();
   display.drawBitmap(
     (display.width()  - LOGO_WIDTH ) / 2,
@@ -168,7 +161,7 @@ void right() {
   display.display();
   delay(1000);
 }
-void left() {
+void left() {  //send left indicator to display
   display.clearDisplay();
   display.drawBitmap(
     (display.width()  - LOGO_WIDTH ) / 2,
